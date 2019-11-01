@@ -11,5 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "socket.io": "^2.3.0"
+  },
+  "engines": {
+  "node": "8.x.x"
   }
 }
