@@ -7,9 +7,11 @@ var http = require("http").createServer(http_handler);
 //url library. Used to process html url requests
 var url = require("url");
 //Websocket
-var io = require("socket.io")(http);
+//var io = require("socket.io")(http);
 //Websocket used to stream video
 var websocket = require("ws");
+
+//var WebSocketServer = require("websocket").server;
 
 //-----------------------------------------------------------------------------------
 //	CONFIGURATION
@@ -17,6 +19,7 @@ var websocket = require("ws");
 
 //Port the server will listen to
 var server_port = 8080;
+//var websocket_stream_port = 8082;
 var websocket_stream_port = 8082;
 //Path of the http and css files for the http server
 var file_index_name = "index.html";
@@ -178,69 +181,74 @@ function http_handler(req, res)
 //-----------------------------------------------------------------------------------
 //	Handle websocket connection to the client
 
-io.on
-(
-	"connection",
-	function (socket)
-	{
-		console.log("connecting...");
+// io.on
+// (
+// 	"connection",
+// 	function (socket)
+// 	{
+// 		console.log("connecting...");
 
-		socket.emit("welcome", { payload: "Server says hello" });
+// 		socket.emit("welcome", { payload: "Server says hello" });
 
-		//Periodically send the current server time to the client in string form
-		setInterval
-		(
-			function()
-			{
-				socket.emit("server_time", { server_time: get_server_time() });
-			},
-			//Send every 333ms
-			333
-		);
+// 		//Periodically send the current server time to the client in string form
+// 		setInterval
+// 		(
+// 			function()
+// 			{
+// 				socket.emit("server_time", { server_time: get_server_time() });
+// 			},
+// 			//Send every 333ms
+// 			333
+// 		);
 
-		socket.on
-		(
-			"myclick",
-			function (data)
-			{
-				timestamp_ms = get_timestamp_ms();
-				socket.emit("profile_ping", { timestamp: timestamp_ms });
-				console.log("button event: " +" client says: " +data.payload);
-			}
-		);
+// 		socket.on
+// 		(
+// 			"myclick",
+// 			function (data)
+// 			{
+// 				timestamp_ms = get_timestamp_ms();
+// 				socket.emit("profile_ping", { timestamp: timestamp_ms });
+// 				console.log("button event: " +" client says: " +data.payload);
+// 			}
+// 		);
 
-		//"ArrowLeft"
-		socket.on
-		(
-			"keyboard",
-			function (data)
-			{
-				timestamp_ms = get_timestamp_ms();
-				socket.emit("profile_ping", { timestamp: timestamp_ms });
-				console.log("keyboard event: " +" client says: " +data.payload);
-			}
-		);
+// 		//"ArrowLeft"
+// 		socket.on
+// 		(
+// 			"keyboard",
+// 			function (data)
+// 			{
+// 				timestamp_ms = get_timestamp_ms();
+// 				socket.emit("profile_ping", { timestamp: timestamp_ms });
+// 				console.log("keyboard event: " +" client says: " +data.payload);
+// 			}
+// 		);
 
-		//profile packets from the client are answer that allows to compute roundway trip time
-		socket.on
-		(
-			"profile_pong",
-			function (data)
-			{
-				timestamp_ms_pong = get_timestamp_ms();
-				timestamp_ms_ping = data.timestamp;
-				console.log("Pong received. Round trip time[ms]: " +(timestamp_ms_pong -timestamp_ms_ping));
-			}
-		);
-	}
-);
+// 		//profile packets from the client are answer that allows to compute roundway trip time
+// 		socket.on
+// 		(
+// 			"profile_pong",
+// 			function (data)
+// 			{
+// 				timestamp_ms_pong = get_timestamp_ms();
+// 				timestamp_ms_ping = data.timestamp;
+// 				console.log("Pong received. Round trip time[ms]: " +(timestamp_ms_pong -timestamp_ms_ping));
+// 			}
+// 		);
+// 	}
+// );
 
 //-----------------------------------------------------------------------------------
 //	WEBSOCKET SERVER: STREAMING VIDEO
 //-----------------------------------------------------------------------------------
 
 // Websocket Server
-var streaming_websocket = new websocket.Server({port: websocket_stream_port, perMessageDeflate: false});
+//var streaming_websocket = new websocket.Server({port: websocket_stream_port, perMessageDeflate: false});
+var streaming_websocket = new websocket.Server({server: http, perMessageDeflate: false});
+// var streaming_websocket = new WebSocketServer({
+// 	httpServer:http,
+// 	autoAcceptConnections: false
+// 	})
 
 streaming_websocket.connectionCount = 0;
 
