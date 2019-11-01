@@ -12,8 +12,8 @@
 # limitations under the License.
 
 # [START gae_quickstart_yaml]
-env: flexible
-runtime: nodejs
+env: standard
+runtime: nodejs10
 #manual_scaling:
 #  instances: 1
 #resources:
