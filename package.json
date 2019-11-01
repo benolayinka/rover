@@ -12,5 +12,8 @@
   "dependencies": {
     "socket.io": "^2.3.0",
     "websocket": "^1.0.30"
+  },
+  "engines": {
+    "node": "10.x.x"
   }
 }

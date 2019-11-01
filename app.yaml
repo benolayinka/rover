@@ -12,14 +12,14 @@
 # limitations under the License.
 
 # [START gae_quickstart_yaml]
-env: standard
+env: flexible
 runtime: nodejs10
-#manual_scaling:
-#  instances: 1
-#resources:
-#  cpu: .5
-#  memory_gb: 0.18
-#  disk_size_gb: 10
+manual_scaling:
+  instances: 1
+resources:
+  cpu: .5
+  memory_gb: 0.18
+  disk_size_gb: 10
 network:
   forwarded_ports:
     - 8082
