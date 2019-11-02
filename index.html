@@ -4,7 +4,6 @@
 	<head>
 		<title>Maze Runner</title>
 		<link rel="stylesheet" href="style.css">
-		<!-- input text control<script type="text/javascript" src="/socket.io/socket.io.js"></script> -->
 		<script type="text/javascript">
 			// var host_ip = document.location.hostname;
 			// console.log("connecting to host: ", host_ip);
@@ -116,9 +115,13 @@
 
 		<!-- Javascript video decoder, take in a data stream from a websocket and paint on a canvas -->
 		<script type="text/javascript" src="jsmpeg.min.js"></script>
+		
 		<script type="text/javascript">
+		//var mysocket = io();
 		var host_ip = document.location.hostname;
 		var mycanvas = document.getElementById("video-canvas");
+		//var url = "ws://" + host_ip +":8080/socket.io/?EIO=3&transport=websocket";
+		//var url = "ws://" + host_ip + ":8080";
 		var url = "ws://" + host_ip;
 		var player = new JSMpeg.Player(url, {canvas: mycanvas});
 		</script>

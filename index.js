@@ -11,8 +11,6 @@ var url = require("url");
 //Websocket used to stream video
 var websocket = require("ws");
 
-//var WebSocketServer = require("websocket").server;
-
 //-----------------------------------------------------------------------------------
 //	CONFIGURATION
 //-----------------------------------------------------------------------------------
@@ -143,6 +141,7 @@ function http_handler(req, res)
 			"data",
 			function(data)
 			{
+				//io.broadcast(data);
 				streaming_websocket.broadcast(data);
 				/*
 				if (req.socket.recording)
@@ -243,7 +242,6 @@ function http_handler(req, res)
 //-----------------------------------------------------------------------------------
 
 // Websocket Server
-//var streaming_websocket = new websocket.Server({port: websocket_stream_port, perMessageDeflate: false});
 var streaming_websocket = new websocket.Server({server: http, perMessageDeflate: false});
 // var streaming_websocket = new WebSocketServer({
 // 	httpServer:http,
@@ -286,11 +284,42 @@ streaming_websocket.broadcast = function(data)
 		{
 			if (client.readyState === websocket.OPEN)
 			{
+				//console.log('ws: ', data)
 				client.send(data);
 			}
 		}
 	);
 };
+
+//BENNY
+// io.on
+// (
+// 	"connection",
+// 	function (socket)
+// 	{
+// 		console.log
+// 		(
+// 			'New io connection: ',
+// 			socket.request.connection.remoteAddress,
+// 			'('+io.engine.clientsCount+" total)"
+// 		);
+
+// 		socket.on
+// 		(
+// 			'disconnect',
+// 			function(reason)
+// 			{
+// 				console.log('Disconnected websocket reason: ' + reason + 'total: ' + io.engine.clientsCount);
+// 			}
+// 		);
+// 	}
+// );
+
+// io.broadcast = function(data)
+// {
+// 	console.log('io: ', data)
+// 	io.sockets.send(data)
+// }
 
 
 //-----------------------------------------------------------------------------------
