@@ -13,7 +13,7 @@
 
 # [START gae_quickstart_yaml]
 env: standard
-runtime: nodejs
+runtime: nodejs10
 # manual_scaling:
 #   instances: 1
 # resources:
