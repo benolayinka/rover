@@ -7,7 +7,11 @@ var http = require("http").createServer(http_handler);
 //url library. Used to process html url requests
 var url = require("url");
 //Websocket
-//var io = require("socket.io")(http);
+// const msgParser = require('socket.io-msgpack-parser');
+// const io = require('socket.io')(http, {
+//   perMessageDeflate: false,
+//   parser: msgParser
+// });
 //Websocket used to stream video
 var websocket = require("ws");
 
@@ -243,10 +247,6 @@ function http_handler(req, res)
 
 // Websocket Server
 var streaming_websocket = new websocket.Server({server: http, perMessageDeflate: false});
-// var streaming_websocket = new WebSocketServer({
-// 	httpServer:http,
-// 	autoAcceptConnections: false
-// 	})
 
 streaming_websocket.connectionCount = 0;
 
@@ -284,7 +284,7 @@ streaming_websocket.broadcast = function(data)
 		{
 			if (client.readyState === websocket.OPEN)
 			{
-				//console.log('ws: ', data)
+				console.log('ws: ', typeof(data))
 				client.send(data);
 			}
 		}
@@ -317,7 +317,7 @@ streaming_websocket.broadcast = function(data)
 
 // io.broadcast = function(data)
 // {
-// 	console.log('io: ', data)
+// 	//console.log('io: ', data)
 // 	io.sockets.send(data)
 // }
 

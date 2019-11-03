@@ -113,7 +113,7 @@
 		<p> This canvas is painted by the javascript player and shows the live stream.'</p>
 		<canvas id="video-canvas" width=640 height=480></canvas>
 
-		<!-- Javascript video decoder, take in a data stream from a websocket and paint on a canvas -->
+		<!-- <script type="text/javascript" src="/socket.io/socket.io.js"></script> Javascript video decoder, take in a data stream from a websocket and paint on a canvas -->
 		<script type="text/javascript" src="jsmpeg.min.js"></script>
 		
 		<script type="text/javascript">
@@ -121,8 +121,7 @@
 		var host_ip = document.location.hostname;
 		var mycanvas = document.getElementById("video-canvas");
 		//var url = "ws://" + host_ip +":8080/socket.io/?EIO=3&transport=websocket";
-		//var url = "ws://" + host_ip + ":8080";
-		var url = "ws://" + host_ip;
+		var url = "ws://" + host_ip + ":8080";
 		var player = new JSMpeg.Player(url, {canvas: mycanvas});
 		</script>
 	</body>
