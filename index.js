@@ -7,11 +7,11 @@ var http = require("http").createServer(http_handler);
 //url library. Used to process html url requests
 var url = require("url");
 //Websocket
-// const msgParser = require('socket.io-msgpack-parser');
-// const io = require('socket.io')(http, {
-//   perMessageDeflate: false,
-//   parser: msgParser
-// });
+const msgParser = require('socket.io-msgpack-parser');
+const io = require('socket.io')(http, {
+   perMessageDeflate: false,
+   parser: msgParser
+ });
 //Websocket used to stream video
 var websocket = require("ws");
 
@@ -184,62 +184,63 @@ function http_handler(req, res)
 //-----------------------------------------------------------------------------------
 //	Handle websocket connection to the client
 
-// io.on
-// (
-// 	"connection",
-// 	function (socket)
-// 	{
-// 		console.log("connecting...");
+io.on
+(
+	"connection",
+	function (socket)
+	{
+		console.log("connecting...");
 
-// 		socket.emit("welcome", { payload: "Server says hello" });
+		socket.emit("welcome", { payload: "Server says hello" });
 
-// 		//Periodically send the current server time to the client in string form
-// 		setInterval
-// 		(
-// 			function()
-// 			{
-// 				socket.emit("server_time", { server_time: get_server_time() });
-// 			},
-// 			//Send every 333ms
-// 			333
-// 		);
+		//Periodically send the current server time to the client in string form
+		setInterval
+		(
+			function()
+			{
+				socket.emit("server_time", { server_time: get_server_time() });
+			},
+			//Send every 333ms
+			333
+		);
 
-// 		socket.on
-// 		(
-// 			"myclick",
-// 			function (data)
-// 			{
-// 				timestamp_ms = get_timestamp_ms();
-// 				socket.emit("profile_ping", { timestamp: timestamp_ms });
-// 				console.log("button event: " +" client says: " +data.payload);
-// 			}
-// 		);
+		socket.on
+		(
+			"myclick",
+			function (data)
+			{
+				timestamp_ms = get_timestamp_ms();
+				socket.emit("profile_ping", { timestamp: timestamp_ms });
+				console.log("button event: " +" client says: " +data.payload);
+			}
+		);
 
-// 		//"ArrowLeft"
-// 		socket.on
-// 		(
-// 			"keyboard",
-// 			function (data)
-// 			{
-// 				timestamp_ms = get_timestamp_ms();
-// 				socket.emit("profile_ping", { timestamp: timestamp_ms });
-// 				console.log("keyboard event: " +" client says: " +data.payload);
-// 			}
-// 		);
+		//"ArrowLeft"
+		socket.on
+		(
+			"keyboard",
+			function (data)
+			{
+				keysToCommand(data.payload)
+				timestamp_ms = get_timestamp_ms();
+				socket.emit("profile_ping", { timestamp: timestamp_ms });
+				console.log("keyboard event: " +" client says: " +data.payload);
+			}
+		);
 
-// 		//profile packets from the client are answer that allows to compute roundway trip time
-// 		socket.on
-// 		(
-// 			"profile_pong",
-// 			function (data)
-// 			{
-// 				timestamp_ms_pong = get_timestamp_ms();
-// 				timestamp_ms_ping = data.timestamp;
-// 				console.log("Pong received. Round trip time[ms]: " +(timestamp_ms_pong -timestamp_ms_ping));
-// 			}
-// 		);
-// 	}
-// );
+		//profile packets from the client are answer that allows to compute roundway trip time
+		socket.on
+		(
+			"profile_pong",
+			function (data)
+			{
+				timestamp_ms_pong = get_timestamp_ms();
+				timestamp_ms_ping = data.timestamp;
+				console.log("Pong received. Round trip time[ms]: " +(timestamp_ms_pong -timestamp_ms_ping));
+			}
+		);
+	}
+);
 
 //-----------------------------------------------------------------------------------
 //	WEBSOCKET SERVER: STREAMING VIDEO
@@ -290,36 +291,6 @@ streaming_websocket.broadcast = function(data)
 		}
 	);
 };
-
-//BENNY
-// io.on
-// (
-// 	"connection",
-// 	function (socket)
-// 	{
-// 		console.log
-// 		(
-// 			'New io connection: ',
-// 			socket.request.connection.remoteAddress,
-// 			'('+io.engine.clientsCount+" total)"
-// 		);
-
-// 		socket.on
-// 		(
-// 			'disconnect',
-// 			function(reason)
-// 			{
-// 				console.log('Disconnected websocket reason: ' + reason + 'total: ' + io.engine.clientsCount);
-// 			}
-// 		);
-// 	}
-// );
-
-// io.broadcast = function(data)
-// {
-// 	//console.log('io: ', data)
-// 	io.sockets.send(data)
-// }
 
 
 //-----------------------------------------------------------------------------------
@@ -400,3 +371,115 @@ function detect_content( file_name )
 
 	}
 }
+
+require('dotenv-safe').config();
+
+var keysToCommand
+
+var serial_path
+var baud
+var scaled_speed
+var scaled_steer
+var inc
+var have_rover = false;
+var have_arm = false;
+
+var serial
+
+if(process.env.ROVER === 'arm') {
+  have_arm = true
+  serial_path = "/dev/ttyUSB0"
+  baud = 9600
+  inc = 5
+} 
+
+if(process.env.ROVER === 'mars') {
+  have_rover = true
+  serial_path = "/dev/ttyACM0"
+  baud = 9600
+  scaled_speed = 90
+  scaled_steer = 90
+}
+
+if(process.env.ROVER === 'traxxas') {
+  have_rover = true
+  serial_path = "/dev/ttyUSB0"
+  baud = 9600
+  scaled_speed = 35
+  scaled_steer = 60
+}
+
+if(have_arm) {
+  serialInit()
+
+  keysToCommand = function(keysPressed) {
+    let x, y, z
+    x = y = z = 0
+
+    if(keysPressed.includes('w'))
+      y+=inc
+    if(keysPressed.includes('s'))
+      y-=inc
+    if(keysPressed.includes('d'))
+      x+=inc
+    if(keysPressed.includes('a'))
+      x-=inc
+    console.debug(`writing x ${x} y ${y} and z ${z}`)
+    serial.write(`rel ${x} ${y} ${z}\r`)
+  }
+}
+
+if(have_rover) {
+  serialInit()
+
+  keysToCommand = function(keysPressed) {
+    let speed, steer
+    speed = steer = 0;
+
+    if(keysPressed.includes('w'))
+      speed += scaled_speed
+    if(keysPressed.includes('s'))
+      speed -= scaled_speed
+    if(keysPressed.includes('d'))
+      steer += scaled_steer
+    if(keysPressed.includes('a'))
+      steer -= scaled_steer
+
+    console.debug(`writing speed ${speed} and steer ${steer}`)
+    serial.write('speed ' + speed + '\r')
+    serial.write('steer ' + steer + '\r')
+  }
+}
+
+function serialInit(){
+  const raspi = require('raspi');
+  const Serial = require('raspi-serial').Serial;
+   
+  raspi.init(() => {
+    serial = new Serial({portId:serial_path, baudrate: baud});
+    try {
+      serial.open();
+    }
+    catch(e) {
+      console.debug(e)
+    }
+  })
+}
+
+keysToCommand = function(keysPressed) {
+    let speed, steer
+    speed = steer = 0;
+
+    if(keysPressed.includes('w'))
+      speed += scaled_speed
+    if(keysPressed.includes('s'))
+      speed -= scaled_speed
+    if(keysPressed.includes('d'))
+      steer += scaled_steer
+    if(keysPressed.includes('a'))
+      steer -= scaled_steer
+
+    console.debug(`writing speed ${speed} and steer ${steer}`)
+    serial.write('speed ' + speed + '\r')
+    serial.write('steer ' + steer + '\r')
+  }
