@@ -75,7 +75,7 @@
 				function onEvent(event)
 				{
 					pressed[event.key] = true;
-					mysocket.emit("keyboard," { payload: Object.keys(pressed)})
+					mysocket.emit("keyboard," { payload: Object.keys(pressed)});
 					//Inform the server that a key has been pressed
 					//mysocket.emit("keyboard", { payload: event.key });
 					console.log("Key press...");
@@ -129,6 +129,7 @@
 		<!-- canvas object, it's painted by the javascript video decoder -->
 		<p> This canvas is painted by the javascript player and shows the live stream.'</p>
 		<canvas id="video-canvas" width=640 height=480></canvas>
+		<img src='http://localhost:5000'>
 
 		<!-- <script type="text/javascript" src="/socket.io/socket.io.js"></script> Javascript video decoder, take in a data stream from a websocket and paint on a canvas -->
 		<script type="text/javascript" src="jsmpeg.min.js"></script>
